@@ -362,7 +362,7 @@ def write_dashboard_data(data: dict, check: bool) -> int:
 
 
 def render_embedded_votes(data: dict) -> str:
-    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     return (
         f"{VOTES_START}\n"
         f'    <script type="application/json" id="votesData">{payload}</script>\n'
