@@ -145,27 +145,37 @@ async function loadVotes() {
 if (copyCmdBtn) {
   const iconCopy = copyCmdBtn.querySelector(".icon-copy");
   const iconCheck = copyCmdBtn.querySelector(".icon-check");
+  let revertTimer = 0;
   const showCheck = (on) => {
     if (iconCopy) iconCopy.hidden = on;
     if (iconCheck) iconCheck.hidden = !on;
-    copyCmdBtn.classList.toggle("copied", on);
+    copyCmdBtn.classList.remove("copied");
+    if (on) {
+      void copyCmdBtn.offsetWidth;
+      copyCmdBtn.classList.add("copied");
+    }
     copyCmdBtn.setAttribute("aria-label", on ? "Copied!" : "Copy installation command");
   };
-  copyCmdBtn.addEventListener("click", async () => {
+  copyCmdBtn.addEventListener("click", () => {
     const code = document.querySelector("#installCmd")?.textContent?.trim();
     if (!code) return;
-    try {
-      await navigator.clipboard.writeText(code);
-    } catch {
+    showCheck(true);
+    clearTimeout(revertTimer);
+    revertTimer = setTimeout(() => showCheck(false), 2000);
+    const write = navigator.clipboard?.writeText
+      ? Promise.race([
+          navigator.clipboard.writeText(code),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("clipboard timeout")), 1000)),
+        ])
+      : Promise.reject(new Error("clipboard unavailable"));
+    write.catch(() => {
       const field = document.createElement("textarea");
       field.value = code;
       document.body.append(field);
       field.select();
       document.execCommand("copy");
       field.remove();
-    }
-    showCheck(true);
-    setTimeout(() => showCheck(false), 2000);
+    });
   });
 }
 
