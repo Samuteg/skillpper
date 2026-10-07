@@ -219,6 +219,9 @@ h1 {
 
 .terminal code {
   flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.95rem;
   white-space: nowrap;

@@ -109,11 +109,11 @@ function applyVoteData(data) {
   state.skills = Array.isArray(data.skills) ? data.skills : [];
   state.repository = data.repository || inferRepositoryFromPagesUrl();
 
-  if (totalVotes) totalVotes.textContent = data.total_votes ?? 0;
+  if (totalVotes)   totalVotes.textContent = data.total_votes ?? 0;
   totalSkills.textContent = data.total_skills ?? state.skills.length;
   updatedAt.textContent = formatDate(data.updated_at);
   configureLinks(state.repository);
-  renderSkills(state.skills);
+  applySearch();
 }
 
 function readEmbeddedVotes() {
@@ -147,8 +147,8 @@ if (copyCmdBtn) {
   const iconCheck = copyCmdBtn.querySelector(".icon-check");
   let revertTimer = 0;
   const showCheck = (on) => {
-    if (iconCopy) iconCopy.hidden = on;
-    if (iconCheck) iconCheck.hidden = !on;
+    if (iconCopy) iconCopy.toggleAttribute("hidden", on);
+    if (iconCheck) iconCheck.toggleAttribute("hidden", !on);
     copyCmdBtn.classList.remove("copied");
     if (on) {
       void copyCmdBtn.offsetWidth;
@@ -159,23 +159,34 @@ if (copyCmdBtn) {
   copyCmdBtn.addEventListener("click", () => {
     const code = document.querySelector("#installCmd")?.textContent?.trim();
     if (!code) return;
-    showCheck(true);
-    clearTimeout(revertTimer);
-    revertTimer = setTimeout(() => showCheck(false), 2000);
+    showCheck(false);
     const write = navigator.clipboard?.writeText
       ? Promise.race([
           navigator.clipboard.writeText(code),
           new Promise((_, reject) => setTimeout(() => reject(new Error("clipboard timeout")), 1000)),
         ])
       : Promise.reject(new Error("clipboard unavailable"));
-    write.catch(() => {
-      const field = document.createElement("textarea");
-      field.value = code;
-      document.body.append(field);
-      field.select();
-      document.execCommand("copy");
-      field.remove();
-    });
+    write
+      .catch(() => {
+        const field = document.createElement("textarea");
+        field.value = code;
+        document.body.append(field);
+        try {
+          field.select();
+          if (!document.execCommand("copy")) throw new Error("clipboard copy failed");
+        } finally {
+          field.remove();
+        }
+      })
+      .then(() => {
+        showCheck(true);
+        clearTimeout(revertTimer);
+        revertTimer = setTimeout(() => showCheck(false), 2000);
+      })
+      .catch(() => {
+        showCheck(false);
+        copyCmdBtn.setAttribute("aria-label", "Copy failed; select and copy the command manually.");
+      });
   });
 }
 

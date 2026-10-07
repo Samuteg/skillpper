@@ -11,6 +11,7 @@ from scripts.update_skill_votes import (
     dashboard_data,
     parse_skill_marker,
     read_skill_metadata,
+    render_embedded_votes,
     render_ranking,
     thumbs_up_count,
     vote_body,
@@ -132,6 +133,31 @@ class SkillVotesTests(unittest.TestCase):
             comparable_payload, comparable_votes,
             "Embedded vote data is outdated. Run: python scripts/update_skill_votes.py",
         )
+
+    def test_embedded_votes_escape_closing_script_tags(self):
+        data = {
+            "updated_at": "2026-10-07T00:00:00Z",
+            "repository": "example/repo",
+            "category": "Skill Votes",
+            "total_skills": 1,
+            "total_votes": 0,
+            "skills": [
+                {
+                    "skill": "evil",
+                    "description": "Tricky </script><script>alert(1)</script> description",
+                    "votes": 0,
+                    "discussion_url": "",
+                    "rank": 1,
+                }
+            ],
+        }
+        block = render_embedded_votes(data)
+        self.assertNotIn("</script><script>", block)
+        self.assertNotIn("</script>", block.split('id="votesData">', 1)[1].rsplit("</script>", 1)[0])
+        match = re.search(r'<script type="application/json" id="votesData">(.*?)</script>', block, re.DOTALL)
+        if match is None:
+            self.fail("rendered block must contain parseable #votesData payload")
+        self.assertEqual(json.loads(match.group(1)), data)
 
     def test_read_skill_metadata_discovers_root_skills(self):
         with tempfile.TemporaryDirectory() as temp:
