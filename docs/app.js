@@ -109,7 +109,7 @@ function applyVoteData(data) {
   state.skills = Array.isArray(data.skills) ? data.skills : [];
   state.repository = data.repository || inferRepositoryFromPagesUrl();
 
-  totalVotes.textContent = data.total_votes ?? 0;
+  if (totalVotes) totalVotes.textContent = data.total_votes ?? 0;
   totalSkills.textContent = data.total_skills ?? state.skills.length;
   updatedAt.textContent = formatDate(data.updated_at);
   configureLinks(state.repository);
