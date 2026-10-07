@@ -12,6 +12,8 @@ const totalSkills = document.querySelector("#totalSkills");
 const updatedAt = document.querySelector("#updatedAt");
 const syncButton = document.querySelector("#syncButton");
 const repositoryLink = document.querySelector("#repositoryLink");
+const copyCmdBtn = document.querySelector("#copyCmdBtn");
+const installGuideLink = document.querySelector("#installGuideLink");
 
 function inferRepositoryFromPagesUrl() {
   const host = window.location.hostname;
@@ -58,6 +60,10 @@ function configureLinks(repository) {
 
   repositoryLink.href = repositoryUrl(repository);
   repositoryLink.hidden = false;
+
+  if (installGuideLink) {
+    installGuideLink.href = `${repositoryUrl(repository)}#how-to-install`;
+  }
 }
 
 function renderSkills(skills) {
@@ -118,6 +124,28 @@ async function loadVotes() {
     emptyState.textContent = "The dashboard could not load votes.json.";
     emptyState.hidden = false;
   }
+}
+
+if (copyCmdBtn) {
+  copyCmdBtn.addEventListener("click", async () => {
+    const code = copyCmdBtn.previousElementSibling?.textContent?.trim();
+    if (!code) return;
+    try {
+      await navigator.clipboard.writeText(code);
+      copyCmdBtn.textContent = "Copied!";
+      copyCmdBtn.classList.add("copied");
+      setTimeout(() => {
+        copyCmdBtn.textContent = "Copy";
+        copyCmdBtn.classList.remove("copied");
+      }, 2000);
+    } catch {
+      // Fallback if clipboard API is blocked
+      copyCmdBtn.textContent = "Copied!";
+      setTimeout(() => {
+        copyCmdBtn.textContent = "Copy";
+      }, 2000);
+    }
+  });
 }
 
 searchInput.addEventListener("input", applySearch);
