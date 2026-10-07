@@ -105,24 +105,40 @@ function applySearch() {
   renderSkills(filtered);
 }
 
+function applyVoteData(data) {
+  state.skills = Array.isArray(data.skills) ? data.skills : [];
+  state.repository = data.repository || inferRepositoryFromPagesUrl();
+
+  totalVotes.textContent = data.total_votes ?? 0;
+  totalSkills.textContent = data.total_skills ?? state.skills.length;
+  updatedAt.textContent = formatDate(data.updated_at);
+  configureLinks(state.repository);
+  renderSkills(state.skills);
+}
+
+function readEmbeddedVotes() {
+  const node = document.querySelector("#votesData");
+  if (!node) return null;
+  try {
+    return JSON.parse(node.textContent);
+  } catch {
+    return null;
+  }
+}
+
 async function loadVotes() {
+  const embedded = readEmbeddedVotes();
+  if (embedded) applyVoteData(embedded);
   try {
     const response = await fetch("votes.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`Vote data returned ${response.status}`);
-    const data = await response.json();
-
-    state.skills = Array.isArray(data.skills) ? data.skills : [];
-    state.repository = data.repository || inferRepositoryFromPagesUrl();
-
-    totalVotes.textContent = data.total_votes ?? 0;
-    totalSkills.textContent = data.total_skills ?? state.skills.length;
-    updatedAt.textContent = formatDate(data.updated_at);
-    configureLinks(state.repository);
-    renderSkills(state.skills);
+    applyVoteData(await response.json());
   } catch (error) {
-    updatedAt.textContent = "Could not load vote data";
-    emptyState.textContent = "The dashboard could not load votes.json.";
-    emptyState.hidden = false;
+    if (!embedded) {
+      updatedAt.textContent = "Could not load vote data";
+      emptyState.textContent = "The dashboard could not load vote data.";
+      emptyState.hidden = false;
+    }
   }
 }
 
