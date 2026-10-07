@@ -22,21 +22,31 @@
 
       <section class="hero" aria-labelledby="pageTitle">
         <div class="hero-copy">
-          <p class="eyebrow">Community leaderboard</p>
-          <h1 id="pageTitle">Find the skills developers trust most.</h1>
+          <h1 id="pageTitle">Reusable skills for your AI coding agent.</h1>
           <p class="hero-text">
-            Vote counts come from GitHub Discussion reactions. Use search to scan the collection, then open a skill's vote thread to support it.
+            Skillpper is a community collection of focused workflows for everyday development work. Install the ones that fit your project with one command:
           </p>
-          <div class="hero-install" aria-label="Installation guide">
-            <p class="install-desc">
-              Skillpper is a community collection of reusable skills for AI coding agents. Install them in your project with one command:
-            </p>
-            <div class="command-box">
-              <code>npx skills add kipperdev/skillpper</code>
-              <button class="copy-btn" id="copyCmdBtn" type="button" aria-label="Copy installation command">Copy</button>
-            </div>
-            <a class="text-link hero-guide-link" id="installGuideLink" href="https://github.com/kipperacademy/skillpper#how-to-install" target="_blank" rel="noopener noreferrer">Read full installation guide &rarr;</a>
+          <div class="terminal" role="group" aria-label="Installation command">
+            <span class="terminal-prompt" aria-hidden="true">$</span>
+            <code id="installCmd">npx skills add kipperdev/skillpper</code>
+            <button class="terminal-copy" id="copyCmdBtn" type="button" aria-label="Copy installation command" aria-live="polite">
+              <svg class="icon-copy" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"></rect>
+                <path d="M10.5 5.5v-2a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3.5v5A1.5 1.5 0 0 0 4 10h1.5"></path>
+              </svg>
+              <svg class="icon-check" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+                <path d="M3 8.5l3.5 3.5L13 4.5"></path>
+              </svg>
+            </button>
           </div>
+          <p class="hero-links">
+            <a class="text-link" id="installGuideLink" href="https://github.com/kipperacademy/skillpper#how-to-install">Installation guide</a>
+            <span class="hero-links-sep" aria-hidden="true">&middot;</span>
+            <a class="text-link" href="#leaderboardTitle">Browse the ranking</a>
+          </p>
+          <p class="hero-note">
+            Ranking by GitHub Discussion votes — search below, then open a skill's vote thread to support it.
+          </p>
         </div>
         <div class="hero-panel" aria-label="Ranking summary">
           <img class="hero-logo" src="logo.webp" alt="Skillpper mascot">

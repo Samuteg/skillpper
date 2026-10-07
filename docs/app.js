@@ -127,24 +127,29 @@ async function loadVotes() {
 }
 
 if (copyCmdBtn) {
+  const iconCopy = copyCmdBtn.querySelector(".icon-copy");
+  const iconCheck = copyCmdBtn.querySelector(".icon-check");
+  const showCheck = (on) => {
+    if (iconCopy) iconCopy.hidden = on;
+    if (iconCheck) iconCheck.hidden = !on;
+    copyCmdBtn.classList.toggle("copied", on);
+    copyCmdBtn.setAttribute("aria-label", on ? "Copied!" : "Copy installation command");
+  };
   copyCmdBtn.addEventListener("click", async () => {
-    const code = copyCmdBtn.previousElementSibling?.textContent?.trim();
+    const code = document.querySelector("#installCmd")?.textContent?.trim();
     if (!code) return;
     try {
       await navigator.clipboard.writeText(code);
-      copyCmdBtn.textContent = "Copied!";
-      copyCmdBtn.classList.add("copied");
-      setTimeout(() => {
-        copyCmdBtn.textContent = "Copy";
-        copyCmdBtn.classList.remove("copied");
-      }, 2000);
     } catch {
-      // Fallback if clipboard API is blocked
-      copyCmdBtn.textContent = "Copied!";
-      setTimeout(() => {
-        copyCmdBtn.textContent = "Copy";
-      }, 2000);
+      const field = document.createElement("textarea");
+      field.value = code;
+      document.body.append(field);
+      field.select();
+      document.execCommand("copy");
+      field.remove();
     }
+    showCheck(true);
+    setTimeout(() => showCheck(false), 2000);
   });
 }
 
